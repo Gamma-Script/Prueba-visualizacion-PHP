@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Prueba</title>
+        <script src="jQuery/jQuery.js"></script>
+        <script src="codemirror/lib/codemirror.js"></script>
+        <script src="codemirror/mode/htmlmixed/htmlmixed.js"></script>
+        <script src="codemirror/mode/xml/xml.js"></script>
+        <script src="codemirror/mode/javascript/javascript.js"></script>
+        <script src="codemirror/mode/css/css.js"></script>
+        <script src="codemirror/mode/clike/clike.js"></script>
+        <script src="codemirror/mode/php/php.js"></script>
+        <script src="codemirror/addon/selection/active-line.js"></script>
+        <script src="codemirror/addon/edit/matchbrackets.js"></script>
+
+        <link href="codemirror/lib/codemirror.css" type="text/css" rel="stylesheet"></link>
+        <link rel="stylesheet" type="text/css" href="codemirror/theme/ambiance.css">
+    </head>
+    <body>
+        <textarea id="textAreaCodigo"></textarea>
+
+        <div class="app-row">
+            <button class="btn-action" id="run">Run</button>
+            <button class="btn-action" id="clear">Clear</button>
+            <button class="btn-action" id="refresh">Refresh</button>
+        </div>
+
+        <div class="app-row">   
+            <div id="result"></div>
+        </div>
+
+        <script>
+            $(document).ready(function(){
+                /*var editor = CodeMirror.fromTextArea(document.getElementById('textAreaCodigo'),{
+                    mode : "application/x-httpd-php",
+                    lineNumbers : true,
+                    matchBrackets : true,
+                    theme : "ambiance",
+                    lineWiseCopyCut : true,
+                    undoDepth : 200
+                });*/
+                
+                $(document).on('click', '#run', function(e){
+                    e.preventDefault();
+                    $("#error").html("").hide();
+                    //var editorCode = editor.getValue();
+                    var texto = document.getElementById("textAreaCodigo").value;
+                    if(texto != ''){
+                        $.ajax({
+                            url: 'file-write.php',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {"input":texto},
+                            success:function(response){
+                            },
+                            complete:function(){
+                                $.ajax({
+                                    url: 'code-editable.php',
+                                    type: 'GET',
+                                    success:function(response){
+                                        console.log("response:  " + response);
+                                        $("#result").html(response);
+                                    },
+                                    error:function(){
+                                        console.log("error: "+response);
+                                    }
+                                });
+                            }
+                        });
+
+                    } else{
+                        $("#error").html("Code should not be empty").show();
+                    }
+
+                });
+
+                $(document).on('click', '#clear', function(e){
+                    e.preventDefault();
+                    $("#error").html("").hide();
+                    editor.setValue('');
+                });
+
+                $(document).on('click', '#refresh', function(e){
+                    e.preventDefault();
+                    $("#error").html("").hide();
+                    location.reload();
+                });
+            });
+        </script>
+    </body>
+</html>
